@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">BleBasic</string>
+    <string name="listdevices">Pair</string>
+    <string name="send">Send</string>
+    <string name="blank"> </string>
+    <string name="sendhint">Enter text</string>
+    <string name="status">status</string>
+    <string name="cancel">Cancel</string>
+</resources>
