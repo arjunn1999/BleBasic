@@ -1,1 +1,1 @@
-Basic app to communicate with bluetooth
+Basic app to communicate with ble module
