@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
                     status.setText("Message Recieved");
                     byte[] readbuff = (byte[]) message.obj;
                     String st = new String(readbuff,0,message.arg1);
+                    System.out.println(st);
                     messages.setText(messages.getText()+"\n"+st);
                     break;
                 case STATE_MESSAGE_SENT:
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MY_UUID= UUID.fromString("f5f7410c-25d1-4f37-8a39-45df252aa125");
+        MY_UUID= UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
         setContentView(R.layout.activity_main);
         adapter = BluetoothAdapter.getDefaultAdapter();
@@ -140,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 String m = String.valueOf(msg.getText());
                 if(m!=null || m!=""){
                     sendRecieve.send(String.valueOf(msg.getText()));
+                    status.setText("Message Sent");
                 }
                 else{
                     Toast.makeText(c, "Content should not be empty", Toast.LENGTH_SHORT).show();
@@ -153,7 +155,9 @@ public class MainActivity extends AppCompatActivity {
         public Connect(BluetoothDevice d){
             device=d;
             try {
+
                 socket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
+                System.out.println("Socket initialized");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -208,14 +212,23 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("Starting SendRecieve");
                 byte[] buffer = new byte[1024];
                 int bytes;
-            try {
-                bytes = input.read(buffer);
-                handler.obtainMessage(STATE_MESSAGE_RECIEVED,bytes,-1,buffer);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                while (true) {
+                    try {
+                        bytes = input.read(buffer);
+                        handler.obtainMessage(STATE_MESSAGE_RECIEVED, bytes, -1, buffer).sendToTarget();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
         }
+
+
+        public void interrupt() {
+            System.out.println("Send Recieve Thread Interrupted");
+            super.interrupt();
+        }
+
         public void send(String s){
             byte[] b = s.getBytes(StandardCharsets.UTF_8);
             try {
@@ -229,6 +242,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        adapter.cancelDiscovery();
     }
 }
